@@ -222,6 +222,7 @@ p:last-child { margin-bottom: 0; }
 .quote-form { background:var(--white); border-radius:var(--radius-lg); padding:48px 40px; box-shadow:var(--shadow-md); }
 .form-row { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
 .form-group { margin-bottom:20px; }
+.form-group label { display:block; font-size:0.85rem; font-weight:600; color:var(--charcoal); margin-bottom:6px; }
 .form-label { display:block; font-family:var(--font-heading); font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--charcoal); margin-bottom:8px; }
 .form-control { width:100%; padding:13px 16px; border:2px solid #e0e0e0; border-radius:var(--radius); font-family:var(--font-body); font-size:0.95rem; color:var(--text-dark); background:var(--white); transition:var(--transition); outline:none; }
 .form-control:focus { border-color:var(--green-primary); box-shadow:0 0 0 3px rgba(46,125,50,0.12); }
