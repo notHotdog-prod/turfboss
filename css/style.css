@@ -330,3 +330,75 @@ textarea.form-control { resize:vertical; min-height:120px; }
 .fade-in.visible { opacity:1; transform:translateY(0); }
 .sticky-cta { position:fixed; bottom:0; left:0; right:0; background:var(--green-dark); padding:14px 24px; display:flex; justify-content:center; gap:16px; z-index:900; transform:translateY(100%); transition:transform 0.3s; }
 .sticky-cta.visible { transform:translateY(0); }
+
+/* ── Hero title contrast fix ── */
+.page-hero h1,
+.hero-content h1,
+.hero h1 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.9) !important;
+}
+.page-hero p,
+.hero-content p,
+.hero-subtitle {
+  color: rgba(255,255,255,0.95) !important;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+}
+
+/* ── About Us nav no-wrap ── */
+.nav-links a[href*="about"] {
+  white-space: nowrap;
+}
+
+/* ── Free Quote modal overlay ── */
+.quote-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.quote-modal-overlay.open {
+  display: flex;
+}
+.quote-modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 40px;
+  max-width: 560px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.quote-modal h2 {
+  font-family: var(--font-heading);
+  color: var(--green-dark);
+  margin-bottom: 8px;
+  font-size: 1.6rem;
+}
+.quote-modal p.modal-sub {
+  color: #666;
+  margin-bottom: 24px;
+  font-size: 0.95rem;
+}
+.quote-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: #666;
+  line-height: 1;
+}
+.quote-modal-close:hover { color: #333; }
+@media (max-width: 768px) {
+  .quote-modal { padding: 28px 20px; }
+  .quote-modal h2 { font-size: 1.3rem; }
+}

@@ -53,6 +53,12 @@
     fadeEls.forEach(el => fadeObs.observe(el));
   }
 
+  // ─── Cloudflare Worker URL ───────────────────────────────────────────────────
+  // After deploying turfboss-worker.js to Cloudflare Workers, paste the
+  // Worker URL here (e.g. https://turfboss-form.YOUR-SUBDOMAIN.workers.dev)
+  const WORKER_URL = 'https://turfboss-form.bryan-boutin.workers.dev';
+  // ─────────────────────────────────────────────────────────────────────────────
+
   // Quote form
   const quoteForm = document.getElementById('quote-form');
   if (quoteForm) {
@@ -61,13 +67,101 @@
       const btn = quoteForm.querySelector('[type="submit"]'); const orig = btn.textContent;
       btn.textContent = 'Sending…'; btn.disabled = true;
       const data = Object.fromEntries(new FormData(quoteForm).entries());
-      // TODO: Replace with actual Monday.com webhook URL
-      const WEBHOOK_URL = 'https://hooks.monday.com/boards/YOUR_WEBHOOK_URL_HERE';
-      try {
-        await fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-      } catch (err) { console.log('Form submission (demo mode)'); }
+
+      if (WORKER_URL !== 'YOUR_CLOUDFLARE_WORKER_URL_HERE') {
+        try {
+          await fetch(WORKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          });
+        } catch (err) { console.error('Form submission error:', err); }
+      } else {
+        console.log('Worker not configured yet. Form data:', data);
+      }
+
       showToast('✅ Request received! We\'ll contact you within 24 hours.', 'success');
       quoteForm.reset(); btn.textContent = orig; btn.disabled = false;
+    });
+  }
+
+
+  // ── Free Quote Modal ─────────────────────────────────────────────────────────
+  const WORKER_URL = 'https://turfboss-form.bryan-boutin.workers.dev';
+
+  function openQuoteModal() {
+    const overlay = document.getElementById('quoteModal');
+    if (overlay) {
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => {
+        const first = overlay.querySelector('input, select, textarea');
+        if (first) first.focus();
+      }, 100);
+    } else {
+      window.location.href = (window.location.pathname.includes('/services/') ||
+        window.location.pathname.includes('/resources/')) ? '../contact.html' : 'contact.html';
+    }
+  }
+
+  // Wire all CTA buttons to open modal
+  document.querySelectorAll('a[href*="contact"], .btn-cta, [data-modal="quote"]').forEach(btn => {
+    const href = btn.getAttribute('href') || '';
+    if (href.includes('contact') || btn.classList.contains('btn-cta') || btn.dataset.modal === 'quote') {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        openQuoteModal();
+      });
+    }
+  });
+
+  // Also wire buttons with "FREE QUOTE", "Get Quote", "Request Quote" text
+  document.querySelectorAll('a, button').forEach(el => {
+    const txt = el.textContent.trim().toUpperCase();
+    if ((txt.includes('FREE QUOTE') || txt.includes('GET QUOTE') || txt.includes('REQUEST') && txt.includes('QUOTE'))
+        && !el.closest('.quote-modal')) {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        openQuoteModal();
+      });
+    }
+  });
+
+  const modalClose = document.getElementById('quoteModalClose');
+  const modalOverlay = document.getElementById('quoteModal');
+  if (modalClose) modalClose.addEventListener('click', () => {
+    modalOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+  });
+  if (modalOverlay) modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) { modalOverlay.classList.remove('open'); document.body.style.overflow = ''; }
+  });
+
+  // Quote form
+  const quoteForm = document.getElementById('quote-form');
+  if (quoteForm) {
+    quoteForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = quoteForm.querySelector('[type="submit"]');
+      const orig = btn.textContent;
+      btn.textContent = 'Sending…'; btn.disabled = true;
+      const fd = new FormData(quoteForm);
+      const data = Object.fromEntries(fd.entries());
+      // Split name into first/last for Monday
+      const nameParts = (data.name || '').trim().split(/\s+/);
+      data.first_name = nameParts[0] || '';
+      data.last_name = nameParts.slice(1).join(' ') || '';
+      try {
+        await fetch(WORKER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+      } catch (err) { console.error('Form error:', err); }
+      showToast('✅ Request received! We\'ll contact you within 24 hours.', 'success');
+      quoteForm.reset();
+      btn.textContent = orig; btn.disabled = false;
+      if (modalOverlay) { modalOverlay.classList.remove('open'); document.body.style.overflow = ''; }
     });
   }
 
