@@ -81,8 +81,13 @@
   });
   document.querySelectorAll('a, button').forEach(el => {
     const txt = el.textContent.trim().toUpperCase();
+    // Exclude: buttons inside the modal itself, and any form submit button
+    // (otherwise the on-page contact form's "Request My Free Quote" submit
+    // gets hijacked into opening the modal instead of submitting.)
     if ((txt.includes('FREE QUOTE') || txt.includes('GET QUOTE') || (txt.includes('REQUEST') && txt.includes('QUOTE')))
-        && !el.closest('.quote-modal')) {
+        && !el.closest('.quote-modal')
+        && !(el.tagName === 'BUTTON' && el.type === 'submit')
+        && !el.closest('form')) {
       el.addEventListener('click', (e) => { e.preventDefault(); openQuoteModal(); });
     }
   });
